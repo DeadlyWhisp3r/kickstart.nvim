@@ -915,13 +915,31 @@ require('lazy').setup({
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(filetypes)
-      vim.api.nvim_create_autocmd('FileType', {
-        pattern = filetypes,
-        callback = function() vim.treesitter.start() end,
-      })
+    build = ':TSUpdate',
+    opts = {
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'verilog',
+        'systemverilog',
+      },
+      auto_install = true,
+      highlight = { enable = true },
+      indent = { enable = true },
+    },
+    config = function(_, opts)
+      -- This 'pcall' handles the case where the plugin isn't fully loaded yet
+      local status, configs = pcall(require, 'nvim-treesitter.configs')
+      if status then configs.setup(opts) end
     end,
   },
 
@@ -945,7 +963,7 @@ require('lazy').setup({
   --    This is the easiest way to modularize your config.
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
